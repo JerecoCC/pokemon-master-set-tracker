@@ -8,6 +8,13 @@ const SetsPage = () => {
       .then((response) => response.json())
       .then((json) => {
         setSets(json.data);
+        const cards = localStorage.getItem("cards") || "{}";
+        if (cards === "{}") {
+          const sets = json.data.reduce((acc: {}, curr: {[key: string]: any}) => (
+            {...acc, [curr.ptcgoCode] : []}
+          ),{});
+          localStorage.setItem("cards", JSON.stringify(sets));
+        }
       });
   }, []);
   return (

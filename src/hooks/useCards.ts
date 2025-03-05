@@ -40,9 +40,12 @@ const useCards = (setId?: string, setCode?: string): ReturnType => {
               localCardsMapped.push(formatCardsData(card, "normal"))
             }
           });
+          const cards = localStorage.getItem("cards");
+          const cardsParsed: { [key: string]: CardType[] } = cards ? JSON.parse(cards) : {};
+          
           setData(localCardsMapped);
-          Object.defineProperty(localCardsParsed, setCode, { value: localCardsMapped });
-          localStorage.setItem("cards", JSON.stringify(localCardsParsed));
+          Object.defineProperty(cardsParsed, setCode, { value: localCardsMapped });
+          localStorage.setItem("cards", JSON.stringify(cardsParsed));
           setIsLoading(false);
         });
       }
