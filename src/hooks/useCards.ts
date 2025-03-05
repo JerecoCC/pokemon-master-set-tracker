@@ -3,6 +3,7 @@ import { CardType, PageSize } from "../types";
 
 type ReturnType = {
   data: [CardType[], (cards: CardType[]) => void],
+  isLoading: boolean;
   pageSize: PageSize;
   addCard: (index: number) => void;
   removeCard: (index: number) => void;
@@ -13,15 +14,19 @@ type ReturnType = {
 const useCards = (setId?: string, setCode?: string): ReturnType => {
   const [data, setData] = useState<CardType[]>([]);
   const [pageSize, setPageSize] = useState<PageSize>(9);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const localCards = localStorage.getItem("cards");
     if (setCode && setId) {
-      const localCardsParsed: { [key: string]: CardType[] } = localCards && JSON.parse(localCards);
-      if (setCode && localCardsParsed[setCode] && localCardsParsed[setCode].length > 0) {
+      const localCardsParsed: { [key: string]: CardType[] } = localCards ? JSON.parse(localCards) : {};
+
+      if (setCode && localCardsParsed?.[setCode] && localCardsParsed[setCode].length > 0) {
         const localSet = localCardsParsed[setCode];
         setData(localSet);
+        setIsLoading(false);
       } else {
+        setIsLoading(true);
         fetch("https://api.pokemontcg.io/v2/cards?&orderBy=number&q=set.id:" + setId)
         .then((response) => response.json())
         .then((json) => {
@@ -35,9 +40,10 @@ const useCards = (setId?: string, setCode?: string): ReturnType => {
               localCardsMapped.push(formatCardsData(card, "normal"))
             }
           });
-          setData(localCardsMapped)
-          localCardsParsed[setCode] = localCardsMapped;
+          setData(localCardsMapped);
+          Object.defineProperty(localCardsParsed, setCode, { value: localCardsMapped });
           localStorage.setItem("cards", JSON.stringify(localCardsParsed));
+          setIsLoading(false);
         });
       }
     }
@@ -82,6 +88,7 @@ const useCards = (setId?: string, setCode?: string): ReturnType => {
 
   return {
     data: [data, setCards],
+    isLoading,
     pageSize,
     addCard,
     removeCard,

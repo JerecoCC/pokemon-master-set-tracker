@@ -22,6 +22,7 @@ const SetPage = () => {
 
   const {
     data: [cards, setCards],
+    isLoading,
     pageSize,
     addCard, 
     removeCard, 
@@ -86,15 +87,22 @@ const SetPage = () => {
             onChangeView={(view: ViewModeType) => setViewMode(view)}
           />
           <hr />
-          {viewMode === "all" && (
-            <ShowAllView />
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <>
+              {viewMode === "all" && (
+                <ShowAllView />
+              )}
+              {viewMode === "missing" && (
+                <MissingView />
+              )}
+              {viewMode === "japanese" && (
+                <JapaneseView />
+              )}
+            </>
           )}
-          {viewMode === "missing" && (
-            <MissingView />
-          )}
-          {viewMode === "japanese" && (
-            <JapaneseView />
-          )}
+          
           <CardModal />
         </div>
       </CardsContext.Provider>
