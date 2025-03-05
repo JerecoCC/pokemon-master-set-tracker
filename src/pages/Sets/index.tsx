@@ -1,0 +1,22 @@
+import { useEffect, useState } from "react";
+import Set from "./Set";
+
+const SetsPage = () => {
+  const [sets, setSets] = useState<{ [key: string]: any }[]>([]);
+  useEffect(() => {
+    fetch("https://api.pokemontcg.io/v2/sets?q=series:Scarlet%20&%20Violet")
+      .then((response) => response.json())
+      .then((json) => {
+        setSets(json.data);
+      });
+  }, []);
+  return (
+    <div className="page sets">
+      {sets.map((set) => (
+        <Set key={set.id} data={set} />
+      ))}
+    </div>
+  );
+};
+
+export default SetsPage;
